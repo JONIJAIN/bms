@@ -44,7 +44,7 @@ function getCompanyById(companyId) {
  */
 function updateCompany(companyId, updateData) {
   try {
-    const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(CONFIG.SHEETS.COMPANIES);
+    const sheet = getSpreadsheet().getSheetByName(CONFIG.SHEETS.COMPANIES);
     const data = sheet.getDataRange().getValues();
     
     for (let i = 1; i < data.length; i++) {
@@ -93,7 +93,7 @@ function deleteCompany(companyId) {
       throw new Error('Cannot delete company with existing data. Archive it instead.');
     }
     
-    const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(CONFIG.SHEETS.COMPANIES);
+    const sheet = getSpreadsheet().getSheetByName(CONFIG.SHEETS.COMPANIES);
     const data = sheet.getDataRange().getValues();
     
     for (let i = 1; i < data.length; i++) {
@@ -127,7 +127,7 @@ function checkCompanyHasData(companyId) {
     ];
     
     for (let sheetName of sheets) {
-      const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(sheetName);
+      const sheet = getSpreadsheet().getSheetByName(sheetName);
       const data = sheet.getDataRange().getValues();
       
       for (let i = 1; i < data.length; i++) {
@@ -150,7 +150,7 @@ function checkCompanyHasData(companyId) {
  */
 function getQuickCaptureStats(companyId) {
   try {
-    const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(CONFIG.SHEETS.QUICK_CAPTURE);
+    const sheet = getSpreadsheet().getSheetByName(CONFIG.SHEETS.QUICK_CAPTURE);
     const data = sheet.getDataRange().getValues();
     
     let total = 0;
@@ -196,7 +196,7 @@ function getQuickCaptureStats(companyId) {
  */
 function getWeeklyTasksStats(companyId) {
   try {
-    const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(CONFIG.SHEETS.WEEKLY_SCHEDULE);
+    const sheet = getSpreadsheet().getSheetByName(CONFIG.SHEETS.WEEKLY_SCHEDULE);
     const data = sheet.getDataRange().getValues();
     
     const today = new Date();
@@ -264,7 +264,7 @@ function getWeeklyTasksStats(companyId) {
  */
 function getWaitingListStats(companyId) {
   try {
-    const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(CONFIG.SHEETS.WAITING_LIST);
+    const sheet = getSpreadsheet().getSheetByName(CONFIG.SHEETS.WAITING_LIST);
     const data = sheet.getDataRange().getValues();
     
     let total = 0;
@@ -302,7 +302,7 @@ function getWaitingListStats(companyId) {
  */
 function getSomedayListStats(companyId) {
   try {
-    const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(CONFIG.SHEETS.SOMEDAY_LIST);
+    const sheet = getSpreadsheet().getSheetByName(CONFIG.SHEETS.SOMEDAY_LIST);
     const data = sheet.getDataRange().getValues();
     
     let total = 0;
@@ -334,7 +334,7 @@ function getSomedayListStats(companyId) {
  */
 function getProductivityStats(companyId) {
   try {
-    const timeSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(CONFIG.SHEETS.TIME_TRACKER);
+    const timeSheet = getSpreadsheet().getSheetByName(CONFIG.SHEETS.TIME_TRACKER);
     const data = timeSheet.getDataRange().getValues();
     
     const today = new Date();
@@ -463,7 +463,7 @@ function exportCompanyData(companyId, includeArchived = false) {
  */
 function getCompanyDataFromSheet(sheetName, companyId, includeArchived) {
   try {
-    const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(sheetName);
+    const sheet = getSpreadsheet().getSheetByName(sheetName);
     const data = sheet.getDataRange().getValues();
     
     if (data.length <= 1) return [];
@@ -522,7 +522,7 @@ function getCompanyDashboard(companyId) {
  */
 function getUpcomingTasks(companyId, days = 7) {
   try {
-    const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(CONFIG.SHEETS.WEEKLY_SCHEDULE);
+    const sheet = getSpreadsheet().getSheetByName(CONFIG.SHEETS.WEEKLY_SCHEDULE);
     const data = sheet.getDataRange().getValues();
     
     const today = new Date();
@@ -569,7 +569,7 @@ function getRecentActivity(companyId, days = 7) {
     const activity = [];
     
     // Get recent captures
-    const captureSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(CONFIG.SHEETS.QUICK_CAPTURE);
+    const captureSheet = getSpreadsheet().getSheetByName(CONFIG.SHEETS.QUICK_CAPTURE);
     const captureData = captureSheet.getDataRange().getValues();
     
     for (let i = 1; i < captureData.length; i++) {
@@ -585,7 +585,7 @@ function getRecentActivity(companyId, days = 7) {
     }
     
     // Get recent completions
-    const scheduleSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(CONFIG.SHEETS.WEEKLY_SCHEDULE);
+    const scheduleSheet = getSpreadsheet().getSheetByName(CONFIG.SHEETS.WEEKLY_SCHEDULE);
     const scheduleData = scheduleSheet.getDataRange().getValues();
     
     for (let i = 1; i < scheduleData.length; i++) {

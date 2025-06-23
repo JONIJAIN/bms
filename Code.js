@@ -21,6 +21,16 @@ const CONFIG = {
   }
 };
 
+// Spreadsheet ID for data storage
+const SPREADSHEET_ID = '1tT8RL7po1zfFaDJgEQwrBdAbIK2DqgtA-Tni1xTns48';
+
+/**
+ * Return the spreadsheet used by the system
+ */
+function getSpreadsheet() {
+  return SpreadsheetApp.openById(SPREADSHEET_ID);
+}
+
 /**
  * Serves the main HTML page
  */
@@ -42,7 +52,7 @@ function include(filename) {
  * Initialize the spreadsheet with required sheets and headers
  */
 function initializeSpreadsheet() {
-  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const ss = getSpreadsheet();
   
   try {
     // Create Companies sheet
@@ -133,7 +143,7 @@ function createOrUpdateSheet(ss, sheetName, headers) {
  * Initialize default settings
  */
 function initializeSettings() {
-  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(CONFIG.SHEETS.SETTINGS);
+  const sheet = getSpreadsheet().getSheetByName(CONFIG.SHEETS.SETTINGS);
   const data = sheet.getDataRange().getValues();
   
   if (data.length <= 1) { // Only header row exists
@@ -157,7 +167,7 @@ function initializeSettings() {
  */
 function getCompanies() {
   try {
-    const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(CONFIG.SHEETS.COMPANIES);
+    const sheet = getSpreadsheet().getSheetByName(CONFIG.SHEETS.COMPANIES);
     const data = sheet.getDataRange().getValues();
     
     if (data.length <= 1) return [];
@@ -190,7 +200,7 @@ function getCompanies() {
  */
 function addCompany(companyData) {
   try {
-    const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(CONFIG.SHEETS.COMPANIES);
+    const sheet = getSpreadsheet().getSheetByName(CONFIG.SHEETS.COMPANIES);
     const id = generateUniqueId();
     const mvot = Math.round(companyData.annualTurnover / CONFIG.MVOT_CALCULATION.WORKING_HOURS_PER_YEAR);
     const now = new Date().toISOString();
@@ -244,7 +254,7 @@ function switchToCompany(companyId) {
  */
 function captureTask(taskData) {
   try {
-    const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(CONFIG.SHEETS.QUICK_CAPTURE);
+    const sheet = getSpreadsheet().getSheetByName(CONFIG.SHEETS.QUICK_CAPTURE);
     const id = generateUniqueId();
     const now = new Date().toISOString();
     
@@ -276,7 +286,7 @@ function captureTask(taskData) {
  */
 function getCapturedTasks(companyId) {
   try {
-    const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(CONFIG.SHEETS.QUICK_CAPTURE);
+    const sheet = getSpreadsheet().getSheetByName(CONFIG.SHEETS.QUICK_CAPTURE);
     const data = sheet.getDataRange().getValues();
     
     if (data.length <= 1) return [];
@@ -315,7 +325,7 @@ function scheduleTuesdayMagic(companyId) {
     const timeBlock = getSetting('TUESDAY_MAGIC_TIME') || '08:00-12:00';
     
     // Add to weekly schedule
-    const scheduleSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(CONFIG.SHEETS.WEEKLY_SCHEDULE);
+    const scheduleSheet = getSpreadsheet().getSheetByName(CONFIG.SHEETS.WEEKLY_SCHEDULE);
     const id = generateUniqueId();
     const now = new Date().toISOString();
     
@@ -377,7 +387,7 @@ function generateUniqueId() {
  */
 function updateSetting(key, value) {
   try {
-    const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(CONFIG.SHEETS.SETTINGS);
+    const sheet = getSpreadsheet().getSheetByName(CONFIG.SHEETS.SETTINGS);
     const data = sheet.getDataRange().getValues();
     
     let updated = false;
@@ -405,7 +415,7 @@ function updateSetting(key, value) {
  */
 function getSetting(key) {
   try {
-    const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(CONFIG.SHEETS.SETTINGS);
+    const sheet = getSpreadsheet().getSheetByName(CONFIG.SHEETS.SETTINGS);
     const data = sheet.getDataRange().getValues();
     
     for (let i = 1; i < data.length; i++) {

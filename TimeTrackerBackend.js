@@ -53,7 +53,7 @@ function stopTaskTracking(taskId, actualEndTime = null) {
  */
 function logManualTimeEntry(timeData) {
   try {
-    const timeSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(CONFIG.SHEETS.TIME_TRACKER);
+    const timeSheet = getSpreadsheet().getSheetByName(CONFIG.SHEETS.TIME_TRACKER);
     const id = generateUniqueId();
     
     const newRow = [
@@ -86,7 +86,7 @@ function logManualTimeEntry(timeData) {
  */
 function getTimeEntries(companyId, limit = 50, offset = 0) {
   try {
-    const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(CONFIG.SHEETS.TIME_TRACKER);
+    const sheet = getSpreadsheet().getSheetByName(CONFIG.SHEETS.TIME_TRACKER);
     const data = sheet.getDataRange().getValues();
     
     if (data.length <= 1) return [];

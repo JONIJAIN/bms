@@ -154,7 +154,7 @@ function configureDefaultSettings() {
       'SYSTEM_VERSION': '1.0.0',
       'SETUP_DATE': new Date().toISOString(),
       'TIMEZONE': Session.getScriptTimeZone(),
-      'LOCALE': SpreadsheetApp.getActiveSpreadsheet().getSpreadsheetLocale(),
+      'LOCALE': getSpreadsheet().getSpreadsheetLocale(),
       
       // BMP Methodology Settings
       'TUESDAY_MAGIC_ENABLED': 'true',
@@ -568,7 +568,7 @@ function systemHealthCheck() {
     
     // Check sheets
     Object.values(CONFIG.SHEETS).forEach(sheetName => {
-      const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(sheetName);
+      const sheet = getSpreadsheet().getSheetByName(sheetName);
       health.sheets[sheetName] = {
         exists: !!sheet,
         rows: sheet ? sheet.getLastRow() : 0,
@@ -644,7 +644,7 @@ function resetSystemToDefaults() {
         deleteExistingTriggers();
         
         // Reset settings
-        const settingsSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(CONFIG.SHEETS.SETTINGS);
+        const settingsSheet = getSpreadsheet().getSheetByName(CONFIG.SHEETS.SETTINGS);
         clearSheetData(settingsSheet, 1);
         
         // Re-run setup
@@ -673,7 +673,7 @@ function exportSystemConfiguration() {
     };
     
     // Export all settings
-    const settingsSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(CONFIG.SHEETS.SETTINGS);
+    const settingsSheet = getSpreadsheet().getSheetByName(CONFIG.SHEETS.SETTINGS);
     const settingsData = settingsSheet.getDataRange().getValues();
     
     for (let i = 1; i < settingsData.length; i++) {

@@ -135,7 +135,7 @@ function getWeeklyTasks(companyId, weekStartDate) {
     const endDate = new Date(startDate);
     endDate.setDate(startDate.getDate() + 6);
     
-    const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(CONFIG.SHEETS.WEEKLY_SCHEDULE);
+    const sheet = getSpreadsheet().getSheetByName(CONFIG.SHEETS.WEEKLY_SCHEDULE);
     const data = sheet.getDataRange().getValues();
     
     const tasks = [];
@@ -557,7 +557,7 @@ function implementSingleBatch(companyId, weekStartDate, recommendation, weeklySc
  */
 function createBatchSession(companyId, date, timeBlock, recommendation) {
   try {
-    const scheduleSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(CONFIG.SHEETS.WEEKLY_SCHEDULE);
+    const scheduleSheet = getSpreadsheet().getSheetByName(CONFIG.SHEETS.WEEKLY_SCHEDULE);
     const batchId = generateUniqueId();
     
     const newRow = [
@@ -651,7 +651,7 @@ function updateTaskToBatch(taskId, batchSessionId) {
  */
 function updateBatchSessionTasks(batchSessionId, taskName) {
   try {
-    const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(CONFIG.SHEETS.WEEKLY_SCHEDULE);
+    const sheet = getSpreadsheet().getSheetByName(CONFIG.SHEETS.WEEKLY_SCHEDULE);
     const data = sheet.getDataRange().getValues();
     
     for (let i = 1; i < data.length; i++) {
