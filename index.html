@@ -1,0 +1,982 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BMP Task Management Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --success-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            --warning-gradient: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+            --dark-bg: #1a1a2e;
+            --card-bg: #16213e;
+            --text-light: #ffffff;
+            --text-secondary: #e0e0e0;
+            --text-muted: #b0b0b0;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: var(--dark-bg);
+            color: var(--text-light);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-weight: 400;
+            font-size: 16px;
+            line-height: 1.5;
+            min-height: 100vh;
+        }
+
+        .navbar {
+            background: var(--primary-gradient);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            color: var(--text-light);
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .navbar-brand {
+            font-weight: 700;
+            font-size: 1.5rem;
+            color: white !important;
+        }
+
+        .navbar-text {
+            color: white !important;
+            font-weight: 500;
+            font-size: 15px;
+        }
+
+        label, .form-label {
+            color: var(--text-light) !important;
+            font-weight: 600;
+            font-size: 15px;
+            margin-bottom: 8px;
+        }
+
+        .text-muted {
+            color: var(--text-muted) !important;
+            font-weight: 400;
+        }
+
+        .text-success {
+            color: #28a745 !important;
+            font-weight: 500;
+        }
+
+        .text-warning {
+            color: #ffc107 !important;
+            font-weight: 500;
+        }
+
+        .text-danger {
+            color: #dc3545 !important;
+            font-weight: 500;
+        }
+
+        small {
+            color: var(--text-secondary) !important;
+            font-size: 14px;
+            font-weight: 400;
+        }
+
+        .fw-bold, strong {
+            font-weight: 700 !important;
+            color: var(--text-light);
+        }
+
+        .dashboard-container {
+            padding: 2rem 0;
+            min-height: calc(100vh - 76px);
+        }
+
+        .stats-card {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+        }
+
+        .stats-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
+        }
+
+        .stats-card h3, .stats-card h4, .stats-card h5, .stats-card h6 {
+            color: var(--text-light) !important;
+            font-weight: 600;
+        }
+
+        .tool-card {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .tool-card:hover {
+            background: rgba(255, 255, 255, 0.08);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .tool-card h6 {
+            color: var(--text-light) !important;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .tool-card small {
+            color: var(--text-secondary) !important;
+            font-size: 13px;
+        }
+
+        .gradient-icon {
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-size: 2rem;
+        }
+
+        .btn-gradient {
+            background: var(--primary-gradient);
+            border: none;
+            border-radius: 25px;
+            padding: 12px 25px;
+            font-weight: 600;
+            font-size: 15px;
+            transition: all 0.3s ease;
+            color: white !important;
+            text-shadow: none;
+        }
+
+        .btn-gradient:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+            color: white !important;
+        }
+
+        .btn-outline-light {
+            border: 2px solid rgba(255, 255, 255, 0.8);
+            color: white !important;
+            font-weight: 500;
+            padding: 8px 16px;
+        }
+
+        .btn-outline-light:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            border-color: white;
+            color: white !important;
+        }
+
+        .btn-secondary {
+            background-color: #6c757d;
+            border-color: #6c757d;
+            color: white !important;
+            font-weight: 500;
+        }
+
+        .btn-secondary:hover {
+            background-color: #5a6268;
+            border-color: #545b62;
+            color: white !important;
+        }
+
+        .company-selector {
+            background: var(--card-bg);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            color: var(--text-light);
+            padding: 0.5rem 1rem;
+        }
+
+        .mvot-display {
+            background: var(--success-gradient);
+            border-radius: 15px;
+            padding: 1rem;
+            text-align: center;
+            margin-bottom: 1rem;
+        }
+
+        .tuesday-magic {
+            background: var(--warning-gradient);
+            border-radius: 15px;
+            padding: 1rem;
+            color: #333;
+            text-align: center;
+        }
+
+        .quick-capture-form {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+        }
+
+        .quick-capture-form h4 {
+            color: var(--text-light) !important;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+        }
+
+        /* Input field improvements */
+        input[type="text"], input[type="email"], input[type="number"], 
+        input[type="date"], input[type="time"], textarea {
+            background: rgba(255, 255, 255, 0.15) !important;
+            border: 2px solid rgba(255, 255, 255, 0.3) !important;
+            border-radius: 10px !important;
+            color: var(--text-light) !important;
+            padding: 15px 18px !important;
+            font-size: 16px !important;
+            font-weight: 500 !important;
+            transition: all 0.3s ease;
+        }
+
+        input[type="text"]:focus, input[type="email"]:focus, input[type="number"]:focus,
+        input[type="date"]:focus, input[type="time"]:focus, textarea:focus {
+            background: rgba(255, 255, 255, 0.25) !important;
+            border-color: #667eea !important;
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25) !important;
+            color: var(--text-light) !important;
+            outline: none !important;
+        }
+
+        input::placeholder, textarea::placeholder {
+            color: var(--text-muted) !important;
+            opacity: 1 !important;
+            font-weight: 400 !important;
+        }
+
+        .form-control, .form-select {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            color: var(--text-light);
+            padding: 12px 15px;
+        }
+
+        .form-control:focus, .form-select:focus {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: #667eea;
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+            color: var(--text-light);
+        }
+
+        .task-item {
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            padding: 18px;
+            margin-bottom: 12px;
+            border-left: 4px solid #667eea;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .task-item:hover {
+            background: rgba(255, 255, 255, 0.12);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .task-item label {
+            color: var(--text-light) !important;
+            font-weight: 500;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .task-item strong {
+            color: var(--text-light) !important;
+            font-weight: 600;
+        }
+
+        .task-item small {
+            color: var(--text-secondary) !important;
+            font-size: 13px;
+        }
+
+        .form-check-input {
+            border: 2px solid rgba(255, 255, 255, 0.4) !important;
+            background-color: transparent !important;
+            width: 1.2em !important;
+            height: 1.2em !important;
+        }
+
+        .form-check-input:checked {
+            background-color: #667eea !important;
+            border-color: #667eea !important;
+        }
+
+        .form-check-input:focus {
+            border-color: #667eea !important;
+            outline: 0 !important;
+            box-shadow: 0 0 0 0.25rem rgba(102, 126, 234, 0.25) !important;
+        }
+
+        .form-check-label {
+            color: var(--text-light) !important;
+            font-weight: 500 !important;
+            margin-left: 8px !important;
+            cursor: pointer !important;
+        }
+
+        /* Status messages */
+        #status {
+            color: #28a745 !important;
+            font-weight: 600 !important;
+            font-size: 15px !important;
+        }
+
+        /* Dropdown arrow for better visibility */
+        .form-select {
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23ffffff' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m1 6 7 7 7-7'/%3e%3c/svg%3e") !important;
+            background-repeat: no-repeat !important;
+            background-position: right 1rem center !important;
+            background-size: 16px 12px !important;
+        }
+
+        .priority-high { border-left-color: #f5576c; }
+        .priority-medium { border-left-color: #ffc107; }
+        .priority-low { border-left-color: #28a745; }
+
+        .modal-content {
+            background: var(--card-bg);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            color: var(--text-light);
+        }
+
+        .modal-header {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .modal-footer {
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .modal-title {
+            color: var(--text-light) !important;
+            font-weight: 600;
+            font-size: 1.25rem;
+        }
+
+        .btn-close-white {
+            filter: invert(1) grayscale(100%) brightness(200%);
+        }
+
+        .loading-spinner {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 9999;
+        }
+
+        .section-header {
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+
+        /* High contrast dropdown styling */
+        select, .form-select {
+            background: rgba(255, 255, 255, 0.15) !important;
+            border: 2px solid rgba(255, 255, 255, 0.3) !important;
+            color: var(--text-light) !important;
+            font-weight: 500 !important;
+            font-size: 16px !important;
+            padding: 15px 18px !important;
+            border-radius: 10px !important;
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23ffffff' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m1 6 7 7 7-7'/%3e%3c/svg%3e") !important;
+        }
+
+        select:focus, .form-select:focus {
+            border-color: #667eea !important;
+            box-shadow: 0 0 0 0.25rem rgba(102, 126, 234, 0.25) !important;
+            background: rgba(255, 255, 255, 0.25) !important;
+        }
+
+        /* Ensure dropdown options are readable */
+        select option, .form-select option {
+            background-color: var(--card-bg) !important;
+            color: var(--text-light) !important;
+            font-weight: 500 !important;
+            padding: 12px !important;
+            border: none !important;
+        }
+
+        select option:hover, .form-select option:hover {
+            background-color: rgba(102, 126, 234, 0.3) !important;
+        }
+
+        select option:checked, .form-select option:checked {
+            background-color: #667eea !important;
+            color: white !important;
+        }
+
+        /* Additional text contrast improvements */
+        .section-header {
+            color: var(--text-light) !important;
+            font-weight: 600 !important;
+            font-size: 1.1rem !important;
+        }
+
+        .list-group-item {
+            background-color: rgba(255, 255, 255, 0.08) !important;
+            border: 1px solid rgba(255, 255, 255, 0.15) !important;
+            margin-bottom: 8px;
+            color: var(--text-light) !important;
+        }
+
+        .alert {
+            color: var(--text-light) !important;
+            border: 1px solid rgba(255, 255, 255, 0.2) !important;
+        }
+
+        @media (max-width: 768px) {
+            .dashboard-container {
+                padding: 1rem 0;
+            }
+            
+            .stats-card, .quick-capture-form {
+                padding: 1.5rem;
+            }
+            
+            .form-control, .form-select {
+                font-size: 16px !important; /* Prevent zoom on iOS */
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg">
+        <div class="container">
+            <a class="navbar-brand text-white" href="#">
+                <i class="fas fa-chart-line me-2"></i>
+                BMP Dashboard
+            </a>
+            <div class="navbar-nav ms-auto">
+                <select class="form-select company-selector me-3" id="companySelector">
+                    <option value="">Select Company</option>
+                </select>
+                <button class="btn btn-outline-light" onclick="openCompanyModal()">
+                    <i class="fas fa-plus me-2"></i>Add Company
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Dashboard -->
+    <div class="dashboard-container">
+        <div class="container">
+            <!-- Company Stats Row -->
+            <div class="row mb-4">
+                <div class="col-md-3">
+                    <div class="stats-card text-center">
+                        <div class="gradient-icon">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <h5 class="mt-3">MVOT</h5>
+                        <h3 id="mvotDisplay">₹0/hour</h3>
+                        <small class="text-muted">Money Value of Time</small>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stats-card text-center">
+                        <div class="gradient-icon">
+                            <i class="fas fa-tasks"></i>
+                        </div>
+                        <h5 class="mt-3">Quick Capture</h5>
+                        <h3 id="captureCount">0</h3>
+                        <small class="text-muted">Items to Process</small>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stats-card text-center">
+                        <div class="gradient-icon">
+                            <i class="fas fa-calendar-week"></i>
+                        </div>
+                        <h5 class="mt-3">This Week</h5>
+                        <h3 id="weeklyTasks">0</h3>
+                        <small class="text-muted">Scheduled Tasks</small>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="tuesday-magic">
+                        <h6><i class="fas fa-star"></i> Tuesday Magic</h6>
+                        <div id="tuesdayStatus">Not Scheduled</div>
+                        <button class="btn btn-sm btn-dark mt-2" onclick="scheduleTuesdayMagic()">
+                            Schedule 4 Hours
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 5 Tools of Managing Work -->
+            <div class="row">
+                <!-- Quick Capture -->
+                <div class="col-lg-6 mb-4">
+                    <div class="quick-capture-form">
+                        <h4 class="section-header">
+                            <i class="fas fa-bolt me-2"></i>Quick Capture
+                        </h4>
+                        <form id="quickCaptureForm">
+                            <div class="mb-3">
+                                <input type="text" class="form-control" id="taskName" placeholder="Enter task or idea..." required>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <select class="form-select" id="taskCategory">
+                                        <option value="Meetings">Meetings</option>
+                                        <option value="Documentation">Documentation</option>
+                                        <option value="Follow-ups">Follow-ups</option>
+                                        <option value="Emails">Emails</option>
+                                        <option value="Business Development">Business Development</option>
+                                        <option value="Admin">Admin</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <select class="form-select" id="taskPriority">
+                                        <option value="High">High Priority</option>
+                                        <option value="Medium" selected>Medium Priority</option>
+                                        <option value="Low">Low Priority</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <textarea class="form-control" id="taskNotes" rows="2" placeholder="Additional notes..."></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-gradient w-100">
+                                <i class="fas fa-plus me-2"></i>Capture Task
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- Captured Items -->
+                    <div class="stats-card">
+                        <h5 class="section-header">
+                            <i class="fas fa-list me-2"></i>Items to Process
+                            <button class="btn btn-sm btn-gradient float-end" onclick="processSelectedTasks()">
+                                Process Selected
+                            </button>
+                        </h5>
+                        <div id="capturedTasks">
+                            <p class="text-muted text-center">No tasks captured yet</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tools Panel -->
+                <div class="col-lg-6">
+                    <div class="stats-card">
+                        <h4 class="section-header">
+                            <i class="fas fa-tools me-2"></i>Work Management Tools
+                        </h4>
+                        
+                        <div class="tool-card" onclick="openScheduler()">
+                            <div class="d-flex align-items-center">
+                                <div class="gradient-icon me-3">
+                                    <i class="fas fa-calendar-alt"></i>
+                                </div>
+                                <div>
+                                    <h6 class="mb-1">Weekly Scheduler</h6>
+                                    <small class="text-muted">Plan your week with time blocks</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="tool-card" onclick="openWaitingList()">
+                            <div class="d-flex align-items-center">
+                                <div class="gradient-icon me-3">
+                                    <i class="fas fa-hourglass-half"></i>
+                                </div>
+                                <div>
+                                    <h6 class="mb-1">Waiting List</h6>
+                                    <small class="text-muted">Tasks waiting for external dependencies</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="tool-card" onclick="openSomedayList()">
+                            <div class="d-flex align-items-center">
+                                <div class="gradient-icon me-3">
+                                    <i class="fas fa-archive"></i>
+                                </div>
+                                <div>
+                                    <h6 class="mb-1">Someday List</h6>
+                                    <small class="text-muted">Future ideas and projects</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="tool-card" onclick="openBatching()">
+                            <div class="d-flex align-items-center">
+                                <div class="gradient-icon me-3">
+                                    <i class="fas fa-layer-group"></i>
+                                </div>
+                                <div>
+                                    <h6 class="mb-1">Task Batching</h6>
+                                    <small class="text-muted">Group similar tasks together</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="tool-card" onclick="openTimeTracker()">
+                            <div class="d-flex align-items-center">
+                                <div class="gradient-icon me-3">
+                                    <i class="fas fa-stopwatch"></i>
+                                </div>
+                                <div>
+                                    <h6 class="mb-1">Time Tracker</h6>
+                                    <small class="text-muted">Track actual vs planned time</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Company Modal -->
+    <div class="modal fade" id="companyModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Add New Company</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="companyForm">
+                        <div class="mb-3">
+                            <label class="form-label">Company Name</label>
+                            <input type="text" class="form-control" id="companyName" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Annual Turnover (₹)</label>
+                            <input type="number" class="form-control" id="annualTurnover" placeholder="e.g., 10000000" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Business Type</label>
+                            <select class="form-select" id="businessType">
+                                <option value="Service">Service</option>
+                                <option value="Product">Product</option>
+                                <option value="Manufacturing">Manufacturing</option>
+                                <option value="Trading">Trading</option>
+                                <option value="Consulting">Consulting</option>
+                            </select>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-gradient" onclick="saveCompany()">Save Company</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Spinner -->
+    <div class="loading-spinner">
+        <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;"></div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Global variables
+        let currentCompany = null;
+        let capturedTasks = [];
+
+        // Initialize the app
+        document.addEventListener('DOMContentLoaded', function() {
+            loadCompanies();
+            loadCapturedTasks();
+            
+            // Setup form handlers
+            document.getElementById('quickCaptureForm').addEventListener('submit', handleQuickCapture);
+            document.getElementById('companySelector').addEventListener('change', switchCompany);
+        });
+
+        // Company management
+        function loadCompanies() {
+            showLoading(true);
+            google.script.run
+                .withSuccessHandler(populateCompanies)
+                .withFailureHandler(handleError)
+                .getCompanies();
+        }
+
+        function populateCompanies(companies) {
+            const selector = document.getElementById('companySelector');
+            selector.innerHTML = '<option value="">Select Company</option>';
+            
+            companies.forEach(company => {
+                const option = document.createElement('option');
+                option.value = company.id;
+                option.textContent = company.name;
+                selector.appendChild(option);
+            });
+            
+            showLoading(false);
+        }
+
+        function switchCompany() {
+            const companyId = document.getElementById('companySelector').value;
+            if (companyId) {
+                showLoading(true);
+                google.script.run
+                    .withSuccessHandler(updateDashboard)
+                    .withFailureHandler(handleError)
+                    .switchToCompany(companyId);
+            }
+        }
+
+        function updateDashboard(companyData) {
+            currentCompany = companyData;
+            
+            // Update MVOT
+            const mvot = Math.round(companyData.annualTurnover / 2300);
+            document.getElementById('mvotDisplay').textContent = `₹${mvot.toLocaleString()}/hour`;
+            
+            // Load tasks for this company
+            loadCapturedTasks();
+            loadWeeklyStats();
+            
+            showLoading(false);
+        }
+
+        function openCompanyModal() {
+            new bootstrap.Modal(document.getElementById('companyModal')).show();
+        }
+
+        function saveCompany() {
+            const formData = {
+                name: document.getElementById('companyName').value,
+                annualTurnover: document.getElementById('annualTurnover').value,
+                businessType: document.getElementById('businessType').value
+            };
+
+            if (!formData.name || !formData.annualTurnover) {
+                alert('Please fill in all required fields');
+                return;
+            }
+
+            showLoading(true);
+            google.script.run
+                .withSuccessHandler(function(result) {
+                    bootstrap.Modal.getInstance(document.getElementById('companyModal')).hide();
+                    loadCompanies();
+                    showSuccess('Company added successfully!');
+                })
+                .withFailureHandler(handleError)
+                .addCompany(formData);
+        }
+
+        // Quick Capture
+        function handleQuickCapture(e) {
+            e.preventDefault();
+            
+            if (!currentCompany) {
+                alert('Please select a company first');
+                return;
+            }
+
+            const taskData = {
+                name: document.getElementById('taskName').value,
+                category: document.getElementById('taskCategory').value,
+                priority: document.getElementById('taskPriority').value,
+                notes: document.getElementById('taskNotes').value,
+                companyId: currentCompany.id,
+                timestamp: new Date().toISOString()
+            };
+
+            showLoading(true);
+            google.script.run
+                .withSuccessHandler(function(result) {
+                    document.getElementById('quickCaptureForm').reset();
+                    loadCapturedTasks();
+                    showSuccess('Task captured successfully!');
+                })
+                .withFailureHandler(handleError)
+                .captureTask(taskData);
+        }
+
+        function loadCapturedTasks() {
+            if (!currentCompany) return;
+            
+            google.script.run
+                .withSuccessHandler(displayCapturedTasks)
+                .withFailureHandler(handleError)
+                .getCapturedTasks(currentCompany.id);
+        }
+
+        function displayCapturedTasks(tasks) {
+            const container = document.getElementById('capturedTasks');
+            
+            if (tasks.length === 0) {
+                container.innerHTML = '<p class="text-muted text-center">No tasks captured yet</p>';
+                document.getElementById('captureCount').textContent = '0';
+                return;
+            }
+
+            document.getElementById('captureCount').textContent = tasks.length;
+            
+            container.innerHTML = tasks.map(task => `
+                <div class="task-item priority-${task.priority.toLowerCase()}">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div class="flex-grow-1">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" value="${task.id}" id="task${task.id}">
+                                <label class="form-check-label" for="task${task.id}">
+                                    <strong>${task.name}</strong>
+                                </label>
+                            </div>
+                            <small class="text-muted d-block mt-1">
+                                <i class="fas fa-tag me-1"></i>${task.category} • 
+                                <i class="fas fa-exclamation-circle me-1"></i>${task.priority} • 
+                                <i class="fas fa-clock me-1"></i>${new Date(task.timestamp).toLocaleDateString()}
+                            </small>
+                            ${task.notes ? `<p class="mb-0 mt-2 small">${task.notes}</p>` : ''}
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function processSelectedTasks() {
+            const checkedTasks = Array.from(document.querySelectorAll('#capturedTasks input[type="checkbox"]:checked'));
+            
+            if (checkedTasks.length === 0) {
+                alert('Please select tasks to process');
+                return;
+            }
+
+            const taskIds = checkedTasks.map(cb => cb.value);
+            
+            // Show processing modal or redirect to scheduler
+            openTaskProcessor(taskIds);
+        }
+
+        // Tool functions
+        function openScheduler() {
+            if (!currentCompany) {
+                alert('Please select a company first');
+                return;
+            }
+            // Implement scheduler modal/page
+            showNotImplemented('Weekly Scheduler');
+        }
+
+        function openWaitingList() {
+            if (!currentCompany) {
+                alert('Please select a company first');
+                return;
+            }
+            showNotImplemented('Waiting List');
+        }
+
+        function openSomedayList() {
+            if (!currentCompany) {
+                alert('Please select a company first');
+                return;
+            }
+            showNotImplemented('Someday List');
+        }
+
+        function openBatching() {
+            if (!currentCompany) {
+                alert('Please select a company first');
+                return;
+            }
+            showNotImplemented('Task Batching');
+        }
+
+        function openTimeTracker() {
+            if (!currentCompany) {
+                alert('Please select a company first');
+                return;
+            }
+            showNotImplemented('Time Tracker');
+        }
+
+        function scheduleTuesdayMagic() {
+            if (!currentCompany) {
+                alert('Please select a company first');
+                return;
+            }
+            
+            showLoading(true);
+            google.script.run
+                .withSuccessHandler(function(result) {
+                    document.getElementById('tuesdayStatus').textContent = 'Scheduled: Next Tuesday 8AM-12PM';
+                    showSuccess('Tuesday Magic scheduled!');
+                })
+                .withFailureHandler(handleError)
+                .scheduleTuesdayMagic(currentCompany.id);
+        }
+
+        // Utility functions
+        function showLoading(show) {
+            const spinner = document.querySelector('.loading-spinner');
+            spinner.style.display = show ? 'block' : 'none';
+        }
+
+        function showSuccess(message) {
+            // Create a toast notification
+            const toast = document.createElement('div');
+            toast.className = 'alert alert-success position-fixed top-0 end-0 m-3';
+            toast.style.zIndex = '9999';
+            toast.innerHTML = `
+                <i class="fas fa-check-circle me-2"></i>${message}
+                <button type="button" class="btn-close" onclick="this.parentElement.remove()"></button>
+            `;
+            document.body.appendChild(toast);
+            
+            setTimeout(() => toast.remove(), 3000);
+            showLoading(false);
+        }
+
+        function handleError(error) {
+            console.error('Error:', error);
+            alert('An error occurred: ' + error.message);
+            showLoading(false);
+        }
+
+        function showNotImplemented(feature) {
+            alert(`${feature} will be implemented in the next version. Stay tuned!`);
+        }
+
+        function loadWeeklyStats() {
+            // Placeholder for weekly statistics
+            document.getElementById('weeklyTasks').textContent = '0';
+        }
+
+        function openTaskProcessor(taskIds) {
+            // Placeholder for task processing interface
+            alert(`Processing ${taskIds.length} tasks. This will open the scheduling interface.`);
+        }
+    </script>
+</body>
+</html>

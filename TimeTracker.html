@@ -1,0 +1,1057 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Time Tracker - BMP</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --success-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            --warning-gradient: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+            --dark-bg: #1a1a2e;
+            --card-bg: #16213e;
+            --text-light: #eee;
+        }
+
+        body {
+            background: var(--dark-bg);
+            color: var(--text-light);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+        }
+
+        .navbar {
+            background: var(--primary-gradient);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .tracker-container {
+            padding: 2rem 0;
+            min-height: calc(100vh - 76px);
+        }
+
+        .timer-widget {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            text-align: center;
+        }
+
+        .timer-display {
+            font-size: 3rem;
+            font-weight: bold;
+            color: #4facfe;
+            margin: 1rem 0;
+            font-family: 'Courier New', monospace;
+        }
+
+        .timer-controls {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 1rem;
+        }
+
+        .btn-timer {
+            border-radius: 50px;
+            padding: 15px 30px;
+            font-weight: 600;
+            border: none;
+            transition: all 0.3s ease;
+        }
+
+        .btn-start {
+            background: var(--success-gradient);
+            color: white;
+        }
+
+        .btn-pause {
+            background: var(--warning-gradient);
+            color: #333;
+        }
+
+        .btn-stop {
+            background: var(--secondary-gradient);
+            color: white;
+        }
+
+        .btn-timer:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        .stats-card {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .stats-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #4facfe;
+        }
+
+        .mvot-display {
+            background: var(--primary-gradient);
+            border-radius: 15px;
+            padding: 1rem;
+            text-align: center;
+            margin-bottom: 1rem;
+        }
+
+        .efficiency-meter {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .progress-ring {
+            width: 120px;
+            height: 120px;
+            margin: 0 auto;
+        }
+
+        .progress-ring circle {
+            fill: transparent;
+            stroke-width: 8;
+            r: 54;
+            cx: 60;
+            cy: 60;
+        }
+
+        .progress-ring .background {
+            stroke: rgba(255, 255, 255, 0.1);
+        }
+
+        .progress-ring .progress {
+            stroke: #4facfe;
+            stroke-linecap: round;
+            transform: rotate(-90deg);
+            transform-origin: 50% 50%;
+            transition: stroke-dasharray 0.3s ease;
+        }
+
+        .time-entry {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-left: 4px solid #667eea;
+            transition: all 0.3s ease;
+        }
+
+        .time-entry:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateX(5px);
+        }
+
+        .time-entry.over-estimate {
+            border-left-color: #f5576c;
+        }
+
+        .time-entry.under-estimate {
+            border-left-color: #28a745;
+        }
+
+        .time-entry.on-target {
+            border-left-color: #ffc107;
+        }
+
+        .form-control, .form-select {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            color: var(--text-light);
+            padding: 12px 15px;
+        }
+
+        .form-control:focus, .form-select:focus {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: #667eea;
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+            color: var(--text-light);
+        }
+
+        .btn-gradient {
+            background: var(--primary-gradient);
+            border: none;
+            border-radius: 25px;
+            padding: 12px 25px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            color: white;
+        }
+
+        .btn-gradient:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+            color: white;
+        }
+
+        .modal-content {
+            background: var(--card-bg);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+        }
+
+        .modal-header {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .modal-footer {
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .active-task-banner {
+            background: var(--success-gradient);
+            color: white;
+            padding: 1rem;
+            border-radius: 10px;
+            margin-bottom: 1rem;
+            text-align: center;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.8; }
+            100% { opacity: 1; }
+        }
+
+        .chart-container {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            height: 300px;
+        }
+
+        .time-breakdown {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .breakdown-item {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 1rem;
+            text-align: center;
+            flex: 1;
+            min-width: 120px;
+        }
+
+        .pomodoro-timer {
+            background: var(--warning-gradient);
+            color: #333;
+            border-radius: 15px;
+            padding: 1rem;
+            text-align: center;
+            margin-bottom: 1rem;
+        }
+
+        .estimation-accuracy {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .accuracy-bar {
+            flex: 1;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .accuracy-progress {
+            height: 100%;
+            background: var(--success-gradient);
+            transition: width 0.3s ease;
+        }
+
+        @media (max-width: 768px) {
+            .timer-display {
+                font-size: 2rem;
+            }
+            
+            .timer-controls {
+                flex-direction: column;
+            }
+            
+            .time-breakdown {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg">
+        <div class="container">
+            <a class="navbar-brand text-white" href="#" onclick="goBackToDashboard()">
+                <i class="fas fa-arrow-left me-2"></i>
+                Time Tracker
+            </a>
+            <div class="navbar-nav ms-auto">
+                <span class="navbar-text text-white me-3" id="companyName">Loading...</span>
+                <button class="btn btn-outline-light btn-sm" onclick="exportTimeData()">
+                    <i class="fas fa-download me-2"></i>Export Data
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Tracker -->
+    <div class="tracker-container">
+        <div class="container">
+            <!-- Active Task Banner -->
+            <div id="activeTaskBanner" class="active-task-banner" style="display: none;">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <i class="fas fa-play-circle me-2"></i>
+                        <strong>Active Task:</strong> <span id="activeTaskName">-</span>
+                    </div>
+                    <div>
+                        <strong id="activeTaskTimer">00:00:00</strong>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <!-- Timer Widget -->
+                <div class="col-lg-6 mb-4">
+                    <div class="timer-widget">
+                        <h4><i class="fas fa-stopwatch me-2"></i>Task Timer</h4>
+                        <div class="timer-display" id="mainTimer">00:00:00</div>
+                        
+                        <div class="mb-3">
+                            <select class="form-select" id="currentTaskSelect">
+                                <option value="">Select a task to track</option>
+                            </select>
+                        </div>
+                        
+                        <div class="timer-controls">
+                            <button class="btn btn-timer btn-start" onclick="startTimer()">
+                                <i class="fas fa-play me-2"></i>Start
+                            </button>
+                            <button class="btn btn-timer btn-pause" onclick="pauseTimer()" disabled>
+                                <i class="fas fa-pause me-2"></i>Pause
+                            </button>
+                            <button class="btn btn-timer btn-stop" onclick="stopTimer()" disabled>
+                                <i class="fas fa-stop me-2"></i>Stop
+                            </button>
+                        </div>
+                        
+                        <div class="mt-3">
+                            <small class="text-muted">
+                                <i class="fas fa-info-circle me-1"></i>
+                                Track actual time vs planned time for MVOT analysis
+                            </small>
+                        </div>
+                    </div>
+
+                    <!-- MVOT Display -->
+                    <div class="mvot-display">
+                        <h6><i class="fas fa-coins me-2"></i>Money Value of Time (MVOT)</h6>
+                        <div class="row">
+                            <div class="col-6">
+                                <div><strong id="mvotRate">₹0/hour</strong></div>
+                                <small>Your MVOT Rate</small>
+                            </div>
+                            <div class="col-6">
+                                <div><strong id="mvotCostToday">₹0</strong></div>
+                                <small>Today's MVOT Cost</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Pomodoro Integration -->
+                    <div class="pomodoro-timer">
+                        <h6><i class="fas fa-tomato me-2"></i>Pomodoro Mode</h6>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <strong>25:00</strong> work / <strong>5:00</strong> break
+                            </div>
+                            <button class="btn btn-sm btn-dark" onclick="togglePomodoroMode()">
+                                <i class="fas fa-toggle-off" id="pomodoroToggle"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Stats Panel -->
+                <div class="col-lg-6">
+                    <!-- Efficiency Meter -->
+                    <div class="efficiency-meter">
+                        <h6 class="text-center mb-3">
+                            <i class="fas fa-tachometer-alt me-2"></i>Today's Efficiency
+                        </h6>
+                        <div class="d-flex align-items-center">
+                            <div class="progress-ring">
+                                <svg>
+                                    <circle class="background" />
+                                    <circle class="progress" id="efficiencyProgress" 
+                                            stroke-dasharray="0 339.292" />
+                                </svg>
+                                <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);">
+                                    <div class="stat-value" id="efficiencyPercentage">0%</div>
+                                    <small class="text-muted">Efficiency</small>
+                                </div>
+                            </div>
+                            <div class="ms-4 flex-grow-1">
+                                <div class="estimation-accuracy">
+                                    <span class="small">Estimation Accuracy:</span>
+                                    <div class="accuracy-bar">
+                                        <div class="accuracy-progress" id="accuracyProgress" style="width: 0%"></div>
+                                    </div>
+                                    <span class="small" id="accuracyPercentage">0%</span>
+                                </div>
+                                <div class="mt-2 small text-muted">
+                                    <div>Planned: <span id="plannedTimeToday">0h</span></div>
+                                    <div>Actual: <span id="actualTimeToday">0h</span></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Daily Stats -->
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="stats-card text-center">
+                                <div class="stat-value" id="tasksCompleted">0</div>
+                                <div class="text-muted">Tasks Completed</div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="stats-card text-center">
+                                <div class="stat-value" id="hoursWorked">0.0h</div>
+                                <div class="text-muted">Hours Worked</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Category Breakdown -->
+                    <div class="stats-card">
+                        <h6><i class="fas fa-chart-pie me-2"></i>Time by Category</h6>
+                        <div class="time-breakdown" id="categoryBreakdown">
+                            <!-- Categories will be populated by JavaScript -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Time Entries -->
+            <div class="row mt-4">
+                <div class="col-12">
+                    <div class="stats-card">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h5><i class="fas fa-history me-2"></i>Recent Time Entries</h5>
+                            <button class="btn btn-gradient btn-sm" onclick="openTimeEntryModal()">
+                                <i class="fas fa-plus me-2"></i>Manual Entry
+                            </button>
+                        </div>
+                        
+                        <div id="timeEntries">
+                            <!-- Time entries will be populated by JavaScript -->
+                        </div>
+                        
+                        <div class="text-center mt-3">
+                            <button class="btn btn-outline-light btn-sm" onclick="loadMoreEntries()">
+                                Load More Entries
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Weekly Analysis -->
+            <div class="row mt-4">
+                <div class="col-lg-6">
+                    <div class="chart-container">
+                        <h6><i class="fas fa-chart-line me-2"></i>Weekly Time Trend</h6>
+                        <canvas id="weeklyChart" width="400" height="200"></canvas>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="chart-container">
+                        <h6><i class="fas fa-chart-bar me-2"></i>Planned vs Actual</h6>
+                        <canvas id="comparisonChart" width="400" height="200"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Manual Time Entry Modal -->
+    <div class="modal fade" id="timeEntryModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Manual Time Entry</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="timeEntryForm">
+                        <div class="mb-3">
+                            <label class="form-label">Task Name</label>
+                            <input type="text" class="form-control" id="manualTaskName" required>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Category</label>
+                                <select class="form-select" id="manualCategory">
+                                    <option value="Meetings">Meetings</option>
+                                    <option value="Documentation">Documentation</option>
+                                    <option value="Follow-ups">Follow-ups</option>
+                                    <option value="Emails">Emails</option>
+                                    <option value="Business Development">Business Development</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Date</label>
+                                <input type="date" class="form-control" id="manualDate" required>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Start Time</label>
+                                <input type="time" class="form-control" id="manualStartTime" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">End Time</label>
+                                <input type="time" class="form-control" id="manualEndTime" required>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Planned Duration (hours)</label>
+                                <input type="number" class="form-control" id="manualPlannedDuration" step="0.25" min="0">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Actual Duration</label>
+                                <input type="text" class="form-control" id="manualActualDuration" readonly>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Notes</label>
+                            <textarea class="form-control" id="manualNotes" rows="3"></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-gradient" onclick="saveManualEntry()">Save Entry</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Global variables
+        let currentCompany = null;
+        let activeTimer = null;
+        let startTime = null;
+        let pausedTime = 0;
+        let currentTask = null;
+        let pomodoroMode = false;
+        let dailyStats = {};
+        let timeEntries = [];
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeTimeTracker();
+            setupEventListeners();
+        });
+
+        function initializeTimeTracker() {
+            // Get company from URL params or storage
+            const urlParams = new URLSearchParams(window.location.search);
+            const companyId = urlParams.get('company') || localStorage.getItem('selectedCompany');
+            
+            if (!companyId) {
+                alert('Please select a company first');
+                goBackToDashboard();
+                return;
+            }
+
+            loadCompanyAndData(companyId);
+        }
+
+        function setupEventListeners() {
+            // Calculate actual duration when end time changes
+            document.getElementById('manualEndTime').addEventListener('change', calculateManualDuration);
+            document.getElementById('manualStartTime').addEventListener('change', calculateManualDuration);
+            
+            // Set default date to today
+            document.getElementById('manualDate').value = new Date().toISOString().split('T')[0];
+        }
+
+        function loadCompanyAndData(companyId) {
+            showLoading(true);
+            
+            // Load company info
+            google.script.run
+                .withSuccessHandler(function(company) {
+                    currentCompany = company;
+                    document.getElementById('companyName').textContent = company.name;
+                    document.getElementById('mvotRate').textContent = `₹${company.mvot.toLocaleString()}/hour`;
+                    
+                    loadTodaysTasks();
+                    loadTimeEntries();
+                    loadDailyStats();
+                })
+                .withFailureHandler(handleError)
+                .switchToCompany(companyId);
+        }
+
+        function loadTodaysTasks() {
+            const today = new Date().toISOString().split('T')[0];
+            
+            google.script.run
+                .withSuccessHandler(function(schedule) {
+                    populateTaskSelect(schedule);
+                })
+                .withFailureHandler(handleError)
+                .getWeeklySchedule(currentCompany.id, today);
+        }
+
+        function populateTaskSelect(schedule) {
+            const select = document.getElementById('currentTaskSelect');
+            select.innerHTML = '<option value="">Select a task to track</option>';
+            
+            const today = new Date().toLocaleDateString('en-US', { weekday: 'long' });
+            const todayTasks = schedule[today]?.tasks || [];
+            
+            todayTasks.forEach(task => {
+                if (task.status !== 'Completed') {
+                    const option = document.createElement('option');
+                    option.value = task.id;
+                    option.textContent = `${task.taskName} (${task.timeBlock})`;
+                    option.setAttribute('data-planned', task.plannedDuration);
+                    option.setAttribute('data-category', task.category);
+                    select.appendChild(option);
+                }
+            });
+        }
+
+        function loadTimeEntries() {
+            google.script.run
+                .withSuccessHandler(function(entries) {
+                    timeEntries = entries;
+                    renderTimeEntries();
+                })
+                .withFailureHandler(handleError)
+                .getTimeEntries(currentCompany.id, 10); // Last 10 entries
+        }
+
+        function loadDailyStats() {
+            const today = new Date().toISOString().split('T')[0];
+            
+            google.script.run
+                .withSuccessHandler(function(stats) {
+                    dailyStats = stats;
+                    updateDashboardStats();
+                    showLoading(false);
+                })
+                .withFailureHandler(handleError)
+                .getDailyTimeStats(currentCompany.id, today);
+        }
+
+        // Timer Functions
+        function startTimer() {
+            const taskSelect = document.getElementById('currentTaskSelect');
+            const selectedTask = taskSelect.value;
+            
+            if (!selectedTask) {
+                alert('Please select a task to track');
+                return;
+            }
+            
+            const taskOption = taskSelect.options[taskSelect.selectedIndex];
+            currentTask = {
+                id: selectedTask,
+                name: taskOption.textContent,
+                plannedDuration: taskOption.getAttribute('data-planned'),
+                category: taskOption.getAttribute('data-category')
+            };
+            
+            startTime = new Date();
+            pausedTime = 0;
+            
+            activeTimer = setInterval(updateTimerDisplay, 1000);
+            
+            // Update UI
+            document.querySelector('.btn-start').disabled = true;
+            document.querySelector('.btn-pause').disabled = false;
+            document.querySelector('.btn-stop').disabled = false;
+            
+            // Show active task banner
+            showActiveTaskBanner();
+            
+            // Start task in backend
+            google.script.run
+                .withFailureHandler(handleError)
+                .startTaskTracking(selectedTask);
+        }
+
+        function pauseTimer() {
+            if (activeTimer) {
+                clearInterval(activeTimer);
+                pausedTime += Date.now() - startTime.getTime();
+                activeTimer = null;
+                
+                // Update UI
+                document.querySelector('.btn-start').disabled = false;
+                document.querySelector('.btn-pause').disabled = true;
+                document.querySelector('.btn-start').innerHTML = '<i class="fas fa-play me-2"></i>Resume';
+            }
+        }
+
+        function stopTimer() {
+            if (activeTimer) {
+                clearInterval(activeTimer);
+            }
+            
+            const endTime = new Date();
+            const totalTime = pausedTime + (endTime.getTime() - startTime.getTime());
+            const hours = totalTime / (1000 * 60 * 60);
+            
+            // Log time entry
+            logTimeEntry(currentTask, startTime, endTime, hours);
+            
+            // Reset timer
+            resetTimer();
+            
+            // Hide active task banner
+            hideActiveTaskBanner();
+        }
+
+        function resetTimer() {
+            if (activeTimer) {
+                clearInterval(activeTimer);
+                activeTimer = null;
+            }
+            
+            startTime = null;
+            pausedTime = 0;
+            currentTask = null;
+            
+            document.getElementById('mainTimer').textContent = '00:00:00';
+            document.getElementById('currentTaskSelect').value = '';
+            
+            // Reset UI
+            document.querySelector('.btn-start').disabled = false;
+            document.querySelector('.btn-pause').disabled = true;
+            document.querySelector('.btn-stop').disabled = true;
+            document.querySelector('.btn-start').innerHTML = '<i class="fas fa-play me-2"></i>Start';
+        }
+
+        function updateTimerDisplay() {
+            if (!startTime) return;
+            
+            const currentTime = Date.now();
+            const totalTime = pausedTime + (currentTime - startTime.getTime());
+            const timeString = formatTime(totalTime);
+            
+            document.getElementById('mainTimer').textContent = timeString;
+            document.getElementById('activeTaskTimer').textContent = timeString;
+        }
+
+        function formatTime(milliseconds) {
+            const totalSeconds = Math.floor(milliseconds / 1000);
+            const hours = Math.floor(totalSeconds / 3600);
+            const minutes = Math.floor((totalSeconds % 3600) / 60);
+            const seconds = totalSeconds % 60;
+            
+            return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        }
+
+        function showActiveTaskBanner() {
+            const banner = document.getElementById('activeTaskBanner');
+            document.getElementById('activeTaskName').textContent = currentTask.name;
+            banner.style.display = 'block';
+        }
+
+        function hideActiveTaskBanner() {
+            document.getElementById('activeTaskBanner').style.display = 'none';
+        }
+
+        function logTimeEntry(task, startTime, endTime, actualHours) {
+            const timeData = {
+                companyId: currentCompany.id,
+                date: startTime.toISOString().split('T')[0],
+                taskName: task.name,
+                category: task.category,
+                plannedDuration: task.plannedDuration,
+                actualDuration: actualHours,
+                startTime: startTime.toISOString(),
+                endTime: endTime.toISOString(),
+                mvotCost: actualHours * currentCompany.mvot
+            };
+            
+            google.script.run
+                .withSuccessHandler(function(result) {
+                    loadTimeEntries();
+                    loadDailyStats();
+                    showSuccess('Time entry logged successfully!');
+                })
+                .withFailureHandler(handleError)
+                .logTimeEntry(task.id, currentCompany.id, timeData);
+        }
+
+        // Manual Entry Functions
+        function openTimeEntryModal() {
+            new bootstrap.Modal(document.getElementById('timeEntryModal')).show();
+        }
+
+        function calculateManualDuration() {
+            const startTime = document.getElementById('manualStartTime').value;
+            const endTime = document.getElementById('manualEndTime').value;
+            
+            if (startTime && endTime) {
+                const start = new Date(`2000-01-01T${startTime}`);
+                const end = new Date(`2000-01-01T${endTime}`);
+                const diffHours = (end - start) / (1000 * 60 * 60);
+                
+                if (diffHours > 0) {
+                    document.getElementById('manualActualDuration').value = diffHours.toFixed(2) + ' hours';
+                }
+            }
+        }
+
+        function saveManualEntry() {
+            const formData = {
+                taskName: document.getElementById('manualTaskName').value,
+                category: document.getElementById('manualCategory').value,
+                date: document.getElementById('manualDate').value,
+                startTime: document.getElementById('manualStartTime').value,
+                endTime: document.getElementById('manualEndTime').value,
+                plannedDuration: document.getElementById('manualPlannedDuration').value,
+                notes: document.getElementById('manualNotes').value
+            };
+            
+            if (!formData.taskName || !formData.date || !formData.startTime || !formData.endTime) {
+                alert('Please fill in all required fields');
+                return;
+            }
+            
+            const start = new Date(`${formData.date}T${formData.startTime}`);
+            const end = new Date(`${formData.date}T${formData.endTime}`);
+            const actualHours = (end - start) / (1000 * 60 * 60);
+            
+            const timeData = {
+                companyId: currentCompany.id,
+                date: formData.date,
+                taskName: formData.taskName,
+                category: formData.category,
+                plannedDuration: formData.plannedDuration || actualHours,
+                actualDuration: actualHours,
+                startTime: start.toISOString(),
+                endTime: end.toISOString(),
+                mvotCost: actualHours * currentCompany.mvot,
+                notes: formData.notes
+            };
+            
+            showLoading(true);
+            
+            google.script.run
+                .withSuccessHandler(function(result) {
+                    bootstrap.Modal.getInstance(document.getElementById('timeEntryModal')).hide();
+                    document.getElementById('timeEntryForm').reset();
+                    loadTimeEntries();
+                    loadDailyStats();
+                    showSuccess('Manual time entry saved!');
+                })
+                .withFailureHandler(handleError)
+                .logManualTimeEntry(timeData);
+        }
+
+        // Display Functions
+        function renderTimeEntries() {
+            const container = document.getElementById('timeEntries');
+            
+            if (timeEntries.length === 0) {
+                container.innerHTML = '<div class="text-center text-muted p-3">No time entries yet</div>';
+                return;
+            }
+            
+            container.innerHTML = timeEntries.map(entry => {
+                const accuracy = calculateAccuracy(entry.plannedDuration, entry.actualDuration);
+                const accuracyClass = getAccuracyClass(accuracy);
+                
+                return `
+                    <div class="time-entry ${accuracyClass}">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div class="flex-grow-1">
+                                <div class="fw-bold">${entry.taskName}</div>
+                                <div class="small text-muted">
+                                    <i class="fas fa-tag me-1"></i>${entry.category} • 
+                                    <i class="fas fa-calendar me-1"></i>${formatDate(entry.date)} • 
+                                    <i class="fas fa-clock me-1"></i>${entry.startTime} - ${entry.endTime}
+                                </div>
+                                <div class="small mt-1">
+                                    <span class="me-3">
+                                        <strong>Planned:</strong> ${entry.plannedDuration}h
+                                    </span>
+                                    <span class="me-3">
+                                        <strong>Actual:</strong> ${entry.actualDuration.toFixed(2)}h
+                                    </span>
+                                    <span>
+                                        <strong>MVOT Cost:</strong> ₹${Math.round(entry.mvotCost).toLocaleString()}
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="text-end">
+                                <div class="small ${accuracyClass === 'on-target' ? 'text-warning' : 
+                                                 accuracyClass === 'under-estimate' ? 'text-success' : 'text-danger'}">
+                                    ${accuracy}% accuracy
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function updateDashboardStats() {
+            // Update efficiency meter
+            const efficiency = dailyStats.efficiency || 0;
+            updateEfficiencyMeter(efficiency);
+            
+            // Update stats
+            document.getElementById('tasksCompleted').textContent = dailyStats.tasksCompleted || 0;
+            document.getElementById('hoursWorked').textContent = (dailyStats.hoursWorked || 0).toFixed(1) + 'h';
+            document.getElementById('plannedTimeToday').textContent = (dailyStats.plannedTime || 0).toFixed(1) + 'h';
+            document.getElementById('actualTimeToday').textContent = (dailyStats.actualTime || 0).toFixed(1) + 'h';
+            document.getElementById('mvotCostToday').textContent = '₹' + Math.round(dailyStats.mvotCost || 0).toLocaleString();
+            
+            // Update accuracy
+            const accuracy = dailyStats.estimationAccuracy || 0;
+            document.getElementById('accuracyPercentage').textContent = accuracy + '%';
+            document.getElementById('accuracyProgress').style.width = accuracy + '%';
+            
+            // Update category breakdown
+            updateCategoryBreakdown(dailyStats.categoryBreakdown || {});
+        }
+
+        function updateEfficiencyMeter(efficiency) {
+            const circle = document.getElementById('efficiencyProgress');
+            const circumference = 2 * Math.PI * 54; // radius is 54
+            const offset = circumference - (efficiency / 100) * circumference;
+            
+            circle.style.strokeDasharray = `${circumference} ${circumference}`;
+            circle.style.strokeDashoffset = offset;
+            
+            document.getElementById('efficiencyPercentage').textContent = efficiency + '%';
+        }
+
+        function updateCategoryBreakdown(breakdown) {
+            const container = document.getElementById('categoryBreakdown');
+            
+            if (Object.keys(breakdown).length === 0) {
+                container.innerHTML = '<div class="text-center text-muted">No data for today</div>';
+                return;
+            }
+            
+            container.innerHTML = Object.entries(breakdown).map(([category, hours]) => `
+                <div class="breakdown-item">
+                    <div class="fw-bold">${hours.toFixed(1)}h</div>
+                    <div class="small text-muted">${category}</div>
+                </div>
+            `).join('');
+        }
+
+        function calculateAccuracy(planned, actual) {
+            if (!planned || planned === 0) return 100;
+            const difference = Math.abs(planned - actual);
+            const accuracy = Math.max(0, 100 - (difference / planned) * 100);
+            return Math.round(accuracy);
+        }
+
+        function getAccuracyClass(accuracy) {
+            if (accuracy >= 90) return 'on-target';
+            if (accuracy >= 70) return 'under-estimate';
+            return 'over-estimate';
+        }
+
+        // Pomodoro Functions
+        function togglePomodoroMode() {
+            pomodoroMode = !pomodoroMode;
+            const toggle = document.getElementById('pomodoroToggle');
+            
+            if (pomodoroMode) {
+                toggle.className = 'fas fa-toggle-on';
+                // Implement pomodoro logic
+            } else {
+                toggle.className = 'fas fa-toggle-off';
+            }
+        }
+
+        // Utility Functions
+        function formatDate(dateString) {
+            return new Date(dateString).toLocaleDateString('en-US', { 
+                month: 'short', 
+                day: 'numeric' 
+            });
+        }
+
+        function loadMoreEntries() {
+            // Load more time entries
+            showNotImplemented('Load more entries');
+        }
+
+        function exportTimeData() {
+            // Export time tracking data
+            showNotImplemented('Export time data');
+        }
+
+        function goBackToDashboard() {
+            if (activeTimer) {
+                if (confirm('You have an active timer. Do you want to stop it before leaving?')) {
+                    stopTimer();
+                }
+            }
+            window.location.href = 'index.html';
+        }
+
+        function showLoading(show) {
+            // Implementation similar to other files
+        }
+
+        function showSuccess(message) {
+            // Implementation similar to other files
+        }
+
+        function handleError(error) {
+            console.error('Error:', error);
+            alert('An error occurred: ' + error.message);
+            showLoading(false);
+        }
+
+        function showNotImplemented(feature) {
+            alert(`${feature} will be implemented in the next version.`);
+        }
+    </script>
+</body>
+</html>
