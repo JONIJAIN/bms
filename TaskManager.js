@@ -72,7 +72,7 @@ function moveTaskToSchedule(taskId, scheduleData) {
     }
     
     // Add to Weekly Schedule
-    const scheduleSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(CONFIG.SHEETS.WEEKLY_SCHEDULE);
+    const scheduleSheet = getSpreadsheet().getSheetByName(CONFIG.SHEETS.WEEKLY_SCHEDULE);
     const newId = generateUniqueId();
     
     const newRow = [
@@ -115,7 +115,7 @@ function moveTaskToWaiting(taskId, waitingData) {
       throw new Error('Task not found in Quick Capture');
     }
     
-    const waitingSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(CONFIG.SHEETS.WAITING_LIST);
+    const waitingSheet = getSpreadsheet().getSheetByName(CONFIG.SHEETS.WAITING_LIST);
     const newId = generateUniqueId();
     
     const newRow = [
@@ -154,7 +154,7 @@ function moveTaskToSomeday(taskId, somedayData) {
       throw new Error('Task not found in Quick Capture');
     }
     
-    const somedaySheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(CONFIG.SHEETS.SOMEDAY_LIST);
+    const somedaySheet = getSpreadsheet().getSheetByName(CONFIG.SHEETS.SOMEDAY_LIST);
     const newId = generateUniqueId();
     
     // Calculate review date (default to 3 months from now)
@@ -206,7 +206,7 @@ function markTaskCompleted(taskId) {
  */
 function getTaskFromQuickCapture(taskId) {
   try {
-    const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(CONFIG.SHEETS.QUICK_CAPTURE);
+    const sheet = getSpreadsheet().getSheetByName(CONFIG.SHEETS.QUICK_CAPTURE);
     const data = sheet.getDataRange().getValues();
     
     for (let i = 1; i < data.length; i++) {
@@ -237,7 +237,7 @@ function getTaskFromQuickCapture(taskId) {
  */
 function updateQuickCaptureStatus(taskId, newStatus) {
   try {
-    const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(CONFIG.SHEETS.QUICK_CAPTURE);
+    const sheet = getSpreadsheet().getSheetByName(CONFIG.SHEETS.QUICK_CAPTURE);
     const data = sheet.getDataRange().getValues();
     
     for (let i = 1; i < data.length; i++) {
@@ -323,7 +323,7 @@ function createWeeklyScheduleTemplate(companyId, weekStartDate) {
       }
     ];
     
-    const scheduleSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(CONFIG.SHEETS.WEEKLY_SCHEDULE);
+    const scheduleSheet = getSpreadsheet().getSheetByName(CONFIG.SHEETS.WEEKLY_SCHEDULE);
     
     for (let dayOffset = 0; dayOffset < 6; dayOffset++) { // Monday to Saturday
       const currentDate = new Date(startDate);
@@ -374,7 +374,7 @@ function getWeeklySchedule(companyId, weekStartDate) {
     const endDate = new Date(startDate);
     endDate.setDate(startDate.getDate() + 6);
     
-    const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(CONFIG.SHEETS.WEEKLY_SCHEDULE);
+    const sheet = getSpreadsheet().getSheetByName(CONFIG.SHEETS.WEEKLY_SCHEDULE);
     const data = sheet.getDataRange().getValues();
     
     const schedule = {};
@@ -436,7 +436,7 @@ function getWeeklySchedule(companyId, weekStartDate) {
  */
 function updateScheduledTask(taskId, updateData) {
   try {
-    const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(CONFIG.SHEETS.WEEKLY_SCHEDULE);
+    const sheet = getSpreadsheet().getSheetByName(CONFIG.SHEETS.WEEKLY_SCHEDULE);
     const data = sheet.getDataRange().getValues();
     
     for (let i = 1; i < data.length; i++) {
@@ -497,7 +497,7 @@ function updateScheduledTask(taskId, updateData) {
  */
 function logTimeEntry(taskId, companyId, timeData) {
   try {
-    const timeSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(CONFIG.SHEETS.TIME_TRACKER);
+    const timeSheet = getSpreadsheet().getSheetByName(CONFIG.SHEETS.TIME_TRACKER);
     const newId = generateUniqueId();
     
     const newRow = [
@@ -527,7 +527,7 @@ function logTimeEntry(taskId, companyId, timeData) {
  */
 function getWaitingList(companyId) {
   try {
-    const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(CONFIG.SHEETS.WAITING_LIST);
+    const sheet = getSpreadsheet().getSheetByName(CONFIG.SHEETS.WAITING_LIST);
     const data = sheet.getDataRange().getValues();
     
     const waitingList = [];
@@ -571,7 +571,7 @@ function getWaitingList(companyId) {
  */
 function getSomedayList(companyId) {
   try {
-    const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(CONFIG.SHEETS.SOMEDAY_LIST);
+    const sheet = getSpreadsheet().getSheetByName(CONFIG.SHEETS.SOMEDAY_LIST);
     const data = sheet.getDataRange().getValues();
     
     const somedayList = [];
@@ -661,7 +661,7 @@ function getCurrentWeekStart() {
 function resolveWaitingTask(waitingTaskId, scheduleData) {
   try {
     // Get task from waiting list
-    const waitingSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(CONFIG.SHEETS.WAITING_LIST);
+    const waitingSheet = getSpreadsheet().getSheetByName(CONFIG.SHEETS.WAITING_LIST);
     const waitingData = waitingSheet.getDataRange().getValues();
     
     let taskData = null;
@@ -686,7 +686,7 @@ function resolveWaitingTask(waitingTaskId, scheduleData) {
     }
     
     // Add to schedule
-    const scheduleSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(CONFIG.SHEETS.WEEKLY_SCHEDULE);
+    const scheduleSheet = getSpreadsheet().getSheetByName(CONFIG.SHEETS.WEEKLY_SCHEDULE);
     const newId = generateUniqueId();
     
     const newRow = [
@@ -722,7 +722,7 @@ function resolveWaitingTask(waitingTaskId, scheduleData) {
 function activateSomedayTask(somedayTaskId) {
   try {
     // Get task from someday list
-    const somedaySheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(CONFIG.SHEETS.SOMEDAY_LIST);
+    const somedaySheet = getSpreadsheet().getSheetByName(CONFIG.SHEETS.SOMEDAY_LIST);
     const somedayData = somedaySheet.getDataRange().getValues();
     
     let taskData = null;
